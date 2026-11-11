@@ -1,5 +1,5 @@
 # Auto-generated — do not edit manually
-# Updated: 2026-11-11T13:09:02.852Z
+# Updated: 2026-11-11T13:10:45.076Z
 
 documents:
   - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/4.matrix-drill-down-to-rental-lines.epic.md
@@ -62,8 +62,8 @@ documents:
     category: press-release
     status: Draft
     tshirt: M
-    period: Q1 FY27
-    targetDate: 2027-03-31
+    period: Q4 FY26
+    targetDate: 2026-12-31
   - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/2.availability-matrix-window.epic.md
     id: dd7c2a9a-182e-4947-b3cf-673c9cc16bb8
     category: epic

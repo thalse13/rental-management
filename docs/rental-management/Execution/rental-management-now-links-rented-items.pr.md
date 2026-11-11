@@ -1,7 +1,7 @@
 ---
 status: Draft
-targetDate: 2027-03-31
-period: Q1 FY27
+targetDate: 2026-12-31
+period: Q4 FY26
 tshirt: M
 ---
 
