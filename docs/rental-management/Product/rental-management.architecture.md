@@ -1,3 +1,7 @@
+---
+status: Draft
+---
+
 # Architecture Document
 
 ## System Overview

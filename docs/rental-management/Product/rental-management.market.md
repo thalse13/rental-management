@@ -1,3 +1,7 @@
+---
+status: Draft
+---
+
 # Market Analysis
 
 ## Overview

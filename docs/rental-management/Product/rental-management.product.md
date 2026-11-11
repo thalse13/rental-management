@@ -1,3 +1,7 @@
+---
+status: Draft
+---
+
 # Product Vision
 
 ## Executive Summary
