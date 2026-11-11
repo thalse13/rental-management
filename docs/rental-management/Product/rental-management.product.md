@@ -8,208 +8,155 @@ status: Draft
 
 ### Product Vision
 
-Rental Management is a Microsoft Dynamics 365 Business Central extension published by Abakion that turns standard sales documents into fully tracked equipment and asset rentals. Its vision is to let rental businesses run time-based, partially invoiced, and pause-aware rentals natively inside Business Central, without leaving the ERP for spreadsheets or side systems. The product is delivered as a cloud-target AL extension (`app.json` target `Cloud`, runtime 17.0, application 28.0.0.0, version 29.0.202645.181872) that augments rather than replaces the standard sales, transfer, and posting flows.
+Abakion Rental Management is a rental management app for Microsoft Dynamics 365 Business Central. It lets equipment rental businesses run the full rental lifecycle inside the ERP they already use: rentals are quoted and ordered on standard Business Central sales documents, tracked physically through shipments and transfers, priced by customer and duration, billed on scheduled invoicing plans, and closed through returns, damage handling, and cancellations.
+
+*Source note: Content is drawn from search summaries of abakion.com/apps/rental-management and docs.abakion.com/docs/rental-management. Full-page wording was not retrieved, so feature details should be checked against the complete documentation.*
 
 ### Support for Strategy
 
-The product supports Abakion's strategy of extending Business Central for specialist verticals while preserving upgrade safety. Several signals in the repository confirm this:
+The product supports a strategy of:
 
-- **AppSource compliance as a hard constraint.** `CLAUDE.md` marks AppSource rules as non-negotiable: no breaking schema changes, all user-facing strings localized via `Label` with `Comment`, no `TestPermissions = Disabled` in production, and `includeSourceInSymbolFile: true`.
-- **Partner ecosystem integration.** The dependency on `Abakion App Manager Core` (id `9cf9feca-8d2d-49f3-a03d-6ae05f910b2c`) shows the app is one module in a family of Abakion apps sharing a common foundation.
-- **Managed delivery pipeline.** Builds run through Azure DevOps and ALOps, with Application Insights telemetry (`westeurope`) for operational visibility.
-- **Localization readiness.** The `TranslationFile` feature is enabled, supporting multi-language rollout across Business Central markets.
+1. **Extending Business Central instead of replacing it.** Rental operations run on standard Business Central sales orders, planning, and warehouse functions, so rental and sales share one system of record.
+2. **Making rented assets traceable.** Serial-number tracking, warehouse locations, and transfer orders show where each machine is and what it has earned.
+3. **Preventing double-bookings.** Business Central planning and reservations keep rental availability consistent across orders.
+4. **Supporting flexible rental pricing.** Prices vary by customer, customer group, currency, variant, rental unit, and duration scale, with rental calendars for pauses and reduced-rate periods.
+5. **Serving combined rental and sales businesses.** Rental items can also be sold directly, and rented and sold items can ship together.
 
 ### Differentiation
 
-The differentiators visible in code are primarily functional depth in time-based pricing and rental lifecycle control:
+Relative to spreadsheets, standalone rental software, and generic ERP add-ons, the product differentiates on:
 
-- **Calendar-driven pause and speed modeling.** Rental calendars carry a `Time Factor` per interval (0% for full pause, fractional for partial pause, above 1 for "upticking"), and the Calculation Engine converts these into chargeable and non-chargeable time per billing step.
-- **Price scales with step-wise billing.** Price scale lines define base price factors, max-amount caps, and step durations; `MergePauseIntoScale` interleaves calendar pauses with price steps so each segment carries both properties.
-- **Daylight-savings-correct billing.** Dedicated DST handling (rounding to seconds rather than milliseconds, `Daylight Savings` flag on steps and calendar lines) addresses a real pain point for clock-time billing in Europe.
-- **Mid-rental partial invoicing.** `InjectCutDateIntoScale` splits steps at the last invoiced date-time, so long rentals can be billed incrementally and posted invoice plans stay consistent with the calendar.
-- **Edit protection during active rentals.** `CheckSalesLineFieldModificationError` blocks changes to Quantity, Unit Price, Location, Type, and related fields once a rental has started, preventing billing drift.
-- **Transfer-aware rentals.** Rental transfer orders and receipts are linked to the rental; receipts cannot exceed the rented quantity and receipt timing is constrained to on or after rental commencement.
+* **Native Business Central experience.** Rentals use standard sales orders, shipments, invoices, and posting, so finance and operations teams do not manage a separate system.
+* **Rental lifecycle depth.** Shipment swaps a rental item for a rental-fee resource line, and returns, partial returns, lost or damaged items, replacements, suspensions, extensions, and cancellations are modeled explicitly.
+* **Flexible pricing and billing.** Duration scales, rental units, rental calendars, and invoicing plans (weekly or monthly) are built in.
+* **Rent and sell in one flow.** Rental items can be sold to the same customer, and mixed rental and sales shipments are supported.
 
 ## Product Context
 
 ### Market Segment Alignment
 
-This product maps directly to the segment defined in the Market Analysis: **Dynamics 365 Business Central Equipment & Asset Rental Operators** (`rental-management-equipment-rental-erp`). Alignment points:
+The product targets equipment rental operators that already use, or are considering, Microsoft Dynamics 365 Business Central. The segment is inferred to include construction, event, and industrial rental businesses with fleets of serial-numbered equipment and both rental and sales activity. Segment sizing and budget ranges are not yet researched and must be validated against the Market Analysis.
 
-- **Use case:** Equipment, vehicle, tool, and machinery rental (the "Rental Category" and "Rental Calendar" objects target reusable resources rather than consumables).
-- **Platform:** Business Central cloud, matching the segment's technology profile.
-- **Geography:** European focus, supported by the `westeurope` telemetry endpoint, Danish-style publisher conventions, `usedynamics.com` help domain, and DST-aware billing.
-- **Buyer roles:** The posting procedures, invoicing plan page, and rental calendars serve finance managers and rental counter staff; the Business Central extension structure serves partner consultants and ERP administrators.
+| Segment Characteristic                                      | Product Response                                                                       |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Business Central as the system of record                    | Rental app built on standard sales orders, planning, and posting                       |
+| Individual, serial-numbered machines                        | Serial-number tracking and warehouse locations                                         |
+| Rentals with variable durations and customer-specific terms | Duration scales, rental units, and customer or group price rules                       |
+| Long or recurring rentals                                   | Rental calendars and scheduled invoicing plans                                         |
+| Returns, damage, and changes during rentals                 | Full and partial returns, damage handling, replacements, extensions, and cancellations |
+| Mixed rental and sales businesses                           | Rented and sold items on the same order and shipment                                   |
 
 ### Competitive Position
 
-Within the Business Central ecosystem, rental functionality is typically either absent from standard BC or addressed by third-party AppSource extensions. Rental Management competes on:
+Competitive context is inferred and has not been researched:
 
-- **Depth of pricing model**: calendar-based pauses, speed factors, price scales, and DST handling exceed what generic sales-price logic supports.
-- **Native integration**: event subscribers hook into `Sales-Post`, `Sales Line`, `Transfer` and report flows instead of forcing a parallel order-entry process.
-- **Partner backing**: Abakion's publisher identity and dependent app family suggest a consultancy-led go-to-market through partners.
+* **Standalone rental management software:** Often separate systems that must be integrated with accounting. The product competes on native Business Central integration.
+* **Generic Business Central or ERP add-ons:** May lack rental-specific logic such as rental calendars, duration scales, and return handling. The product competes on rental depth.
+* **Spreadsheets and manual processes:** Common in smaller operators. The product competes on availability accuracy and billing automation.
 
-Specific named competitors cannot be determined from the repository alone; the competitive position is inferred from functional scope.
+Current position: the product is an existing app with published documentation. Competitor pricing, market share, and go-to-market data are not yet available and should come from SCOUT's research.
 
 ### Strategic Fit
 
-The app fits Abakion's Business Central extension portfolio as a vertical module that reuses shared foundations (`Abakion App Manager Core`) and follows a consistent `SCB 920 <Name>` object naming convention. It extends the Business Central sales model into a rental model without forking base objects, which keeps the product maintainable across BC upgrades.
+* **Fit with company/project strategy:** The product extends the Business Central ecosystem with a vertical rental app, which fits a focused, platform-based strategy.
+* **Fit with market timing:** Not researched. Demand for rental management within Business Central should be validated.
+* **Fit with capability:** The published feature set covers the rental lifecycle. Delivery against that scope must be confirmed against the Architecture document and the app source.
+* **Risks to fit:** Dependence on the Business Central platform and its release cycle. Tax, deposit, and contract rules may vary by country. Payment and e-signature needs may require partners.
 
 ## Ideal Customer Profiles
 
-**Profile 1: Mid-market equipment rental company (primary)**
-- Rents construction, industrial, or event equipment on time-based contracts.
-- Operates Business Central cloud and has a finance function that issues periodic rental invoices.
-- Needs partial invoicing for long-running rentals and clear audit trails for billing disputes.
-- Decision maker: finance manager or operations/rental manager. Users: counter staff creating rental orders, AR clerks posting invoices.
+### ICP A — \[Segment / Industry / Region]
 
-**Profile 2: Vehicle, AV, or IT asset rental operator**
-- Rents vehicles or technical equipment where pauses (maintenance, downtime) and partial-rate periods matter.
-- Requires calendar-based pause handling and transfers between locations while rentals remain tracked.
-- Decision maker: ERP administrator or finance lead.
+#### Company Profile
 
-**Profile 3: Business Central partner consultancy**
-- Implements and maintains Business Central for rental clients.
-- Needs a supported, AppSource-compliant extension with localized UI and stable upgrade paths.
-- Acts as a channel for the product and as a technical user (developers configuring calendars, price scales, and integration points).
+* **Size:** 10-200 employees — to be validated against Market Analysis (inferred: small to mid-sized rental businesses with multiple locations)
+* **Industry:** Equipment rental (construction, event, industrial), inferred
+* **Maturity:** Operators already running Microsoft Dynamics 365 Business Central, or planning to adopt it (inferred)
+
+#### Pain Points Addressed by Product
+
+* Rental and sales orders managed in separate systems, causing double entry and reconciliation work
+* Overlapping bookings and unclear availability for serial-numbered machines
+* Difficulty tracking where each rented item is and when it returns
+* Inconsistent pricing across customers, durations, and currencies
+* Manual billing for long or recurring rentals, and manual handling of damaged or lost items
+
+#### Key Persona
+
+* **Role:** Rental manager or operations lead, working with a finance or ERP administrator
+* **Responsibilities:** Rental orders, shipments, transfers, returns, and billing in Business Central
+* **Goals:** Accurate availability, correct pricing, timely billing, and full tracking of each machine
+* **Challenges:** Balancing rental and sales workflows, handling returns and damage, and keeping ERP data consistent
+* **Buying Criteria:** Native Business Central fit, rental-specific functionality, and support for pricing and invoicing rules
 
 ## Product and Module Scope
 
 ### In Scope
 
-- Rental order and quote handling on standard Business Central sales documents, with rental-specific line fields and header dates (`SCB Rental Inv. Start Date`, `SCB Rental Return Date`).
-- Rental relation lines that track each rental line's document context, start date-time, and invoiced cut-off (`Rental Invoiced to Date-Time`).
-- Rental calendars with pause and speed factors, including line- and header-level calendars with fallback.
-- Price scales with step-based billing, base price and base duration, and max-amount caps.
-- Invoicing plan generation, including Rental, Non-Rental, and Totals line types, and posted invoice plan records.
-- Daylight-savings adjustments within calendar and scale calculations.
-- Rental-aware sales posting procedures, including active and prepared rental checks before standard posting.
-- Transfer order maintenance and transfer receipt/shipment integration for rented items.
-- Edit guards on sales lines during active rentals.
-- Copy utilities for scale and calendar lines between sales documents.
-- Control add-in (`SCBRentalJavaScript`) that triggers an editable list-view toggle in the parent page.
-- Localized labels and translation file support.
+* Rentals added to standard Business Central sales orders
+* Shipment that converts a rental item to a rental-fee resource line
+* Transfer orders for physical movement of rental items
+* Availability and reservations using Business Central planning
+* Serial-number tracking and warehouse locations for rental assets
+* Pricing by customer, customer group, currency, variant, rental unit, and duration scale
+* Rental calendars for pauses and reduced-rate periods
+* Invoicing plans for scheduled (weekly or monthly) billing
+* Full and partial returns, lost or damaged items, replacements, suspensions, extensions, and cancellations
+* Direct sale of rental items and combined rental and sales shipments
 
 ### Out of Scope
 
-- Consumables, sales of owned inventory without a rental period, and standard sales pricing that does not involve rentals.
-- Customer-facing rental portals or self-service booking interfaces (no such objects appear in the repository).
-- Fleet maintenance scheduling, asset depreciation, or equipment condition tracking (not present in the codebase).
-- Non-Cloud deployments: the manifest targets `Cloud` only.
-- Replacement of Business Central's standard posting engine; the extension augments it.
-- Rental analytics or dashboards beyond the invoicing plan pages (not evidenced in the provided files).
+* Replacing Business Central core finance, general ledger, or inventory functions
+* Standalone operation without Business Central
+* Payment acquiring and e-signature services (delegated to partners, inferred)
+* Equipment telematics hardware
+* Dealer sales, floor-plan financing, and construction project management
+* Native desktop applications
 
 ## Modules Overview
 
-| Module | Responsibility | Representative Objects |
-|---|---|---|
-| Rental Management core | Rental lifecycle and line handling | `SCB 920 Rental Management` codeunit, `SCB 920 Rental Relation Line` |
-| Calculation Engine | Calendar-to-scale conversion, invoicing plan, unit prices, DST | `SCB 920 Calculation Engine` codeunit, `SCB 920 Price Scale`, `SCB 920 Price Scale Line` |
-| Rental Calendar | Pause and speed intervals | `SCB 920 Rental Calendar Line` |
-| Invoicing Plan | Per-step billing plan and posted plan | `SCB 920 Rental Inv. Plan Line`, posted invoice plan records |
-| Event Subscribers | Cascading sales, transfer, posting, and field-validation logic | `SCB 920 Event Subscriber` codeunit, `SCB Publishers` |
-| Posting | Rental-specific posting and guards | `SCB 920 GlobalVarsSingleInst`, posting error and confirmation logic |
-| Transfer Integration | Rented item transfer and receipt tracking | Transfer event subscribers, `TransferReceiptQtyErr` logic |
-| UI Extensions | Page and page-extension customizations, control add-in | `page`, `pageextension`, `SCBRentalJavaScript` |
-| Reporting | Rental-related reports including invoicing and deletion of invoiced orders | `report` folder, `Delete Invoiced Sales Orders` subscriber |
-| Setup & Permissions | Rental setup, default rental category, permission sets | `SCB 920 Rental Setup`, `permissionset` folder |
-| Notifications | App enable check gating rental logic | `SCB 920 Notification Mgmt.` codeunit |
+### Module 1
+
+* **Purpose & Objectives:** Core rental management inside Business Central: rental orders, shipment and transfer, availability and serial tracking, pricing and invoicing plans, and returns and changes, so each rental is booked, tracked, billed, and closed correctly.
+* **Key Personas Targeted:** Rental manager, operations and warehouse staff, finance or ERP administrator
+* **Dependencies:** Microsoft Dynamics 365 Business Central (planning, reservations, warehouse, serial tracking, sales and posting); Abakion documentation for configuration (scope of published features to be confirmed)
 
 ## Features Overview
 
-- **Rental order management**: Create rental lines on sales orders and quotes; rental relation lines are auto-created on insert and kept in sync on modify and delete.
-- **Time-based rental pricing**: Base duration and base price drive unit-price calculation across the rental period.
-- **Price scales**: Step-wise pricing with per-step price factors and max-amount caps.
-- **Rental calendars**: Pause, partial pause, and uptick modeling via time factors; header and line calendars with fallback.
-- **Daylight-savings handling**: DST-aware chargeable time and step adjustments.
-- **Invoicing plan**: Automatic generation of rental steps, non-rental lines, and totals; regenerated on demand with optional progress dialog.
-- **Partial invoicing**: Cut-off date-time splits steps so already-invoiced portions are separated from open ones.
-- **Posted invoice plan**: Plan records copied to posted invoices at posting time.
-- **Copy utilities**: Copy price scale and calendar lines between sales headers or lines.
-- **Rental posting procedures**: Standard posting warns or blocks on rental documents with active or prepared rentals, directing users to rental posting.
-- **Edit protection**: Field-level validations block unsafe changes once a rental has started.
-- **Transfer order maintenance**: Rental transfer orders are created, maintained, and deleted with their sales orders.
-- **Transfer receipt controls**: Receipt quantity cannot exceed rented quantity; receipt timing must be on or after rental start.
-- **Document deletion safeguards**: Sales headers with active rental relation lines cannot be deleted.
-- **Rental category resolution**: Rental category is resolved from item, variant, and default setup.
-- **Localized, telemetry-enabled delivery**: Translation file support and Application Insights integration.
+### Feature 1
+
+* **Quick Description:** Rental availability and lifecycle on Business Central sales orders, covering rental orders, shipment to rental-fee lines, transfers, returns, and serial tracking, so that rentals do not double-book and every machine's status is known.
+* **Module:** Module 1 — Core rental management
+* **Key Personas Targeted:** Rental manager, operations and warehouse staff
 
 ## Functional Requirements
 
-**FR-1: Rental line creation**
-The system shall create a rental relation line automatically when a rental sales line is inserted, and delete it when the sales line is deleted.
+### FR-1: \[Requirement Name]
 
-**FR-2: Rental line synchronization**
-The system shall update the corresponding rental relation line and maintain transfer orders when a rental sales line is modified.
+* **Description:** The system shall let users add rental items to a Business Central sales order, ship them as rental-fee resource lines, and track their physical movement through transfer orders, with availability checked through Business Central planning and reservations.
+* **Priority:** Must
+* **Acceptance Criteria:**
+  * [ ] A rental item can be added to a sales order alongside sold items.
+  * [ ] Shipping a rental item creates a rental-fee resource line in place of the item line.
+  * [ ] A rental booking that overlaps an existing reservation for the same serial-numbered asset is blocked with a conflict message.
 
-**FR-3: Rental calendar conversion**
-The system shall convert rental calendar entries for a given date range into scale steps, emitting "Time not covered by calendar" intervals where no entry exists.
+### FR-2: \[Requirement Name]
 
-**FR-4: Calendar time factors**
-The system shall compute chargeable time from each calendar step's time factor, supporting 0% (full pause), fractional (partial pause), and above-1 (uptick) values.
-
-**FR-5: Pause merging**
-The system shall merge calendar-derived pause steps with price scale steps so each billing segment carries both pause classification and price properties.
-
-**FR-6: Cut-date splitting**
-The system shall split any billing step crossing the last invoiced date-time into two steps meeting at that date-time.
-
-**FR-7: Daylight-savings adjustment**
-The system shall represent daylight-savings hour adjustments with second-level precision and exclude them from non-chargeable time.
-
-**FR-8: Invoicing plan generation**
-The system shall regenerate the invoicing plan for a rental order, including Rental, Non-Rental, and Totals line types, when triggered by the user or by posting.
-
-**FR-9: Invoicing plan prerequisites**
-The system shall refuse to calculate an invoicing plan when the rental invoice start date or rental return date is undefined, and display an explanatory message.
-
-**FR-10: Posted plan persistence**
-The system shall copy the invoicing plan to the posted invoice plan when a rental order is posted as an invoice.
-
-**FR-11: Active rental posting guard**
-The system shall warn or block standard sales posting for documents with active or prepared rentals, requiring the rental posting procedure for full functionality.
-
-**FR-12: Document deletion guard**
-The system shall prevent deletion of a sales header while active rental relation lines exist for it.
-
-**FR-13: Active rental edit protection**
-The system shall block changes to Quantity, Unit Price, Location Code, Type, Unit of Measure, and related fields on rental sales lines once the rental has started.
-
-**FR-14: Transfer receipt quantity guard**
-The system shall prevent receipt of more rented items than the rental quantity on a transfer line.
-
-**FR-15: Transfer receipt timing guard**
-The system shall prevent receipt of rental items before the rental commencement date-time.
-
-**FR-16: Scale and calendar copy**
-The system shall copy price scale and calendar lines between sales documents, preserving destination filters and reporting counts to the user.
-
-**FR-17: Localization**
-The system shall present all user-facing text as localized Labels with comments.
-
-**FR-18: Telemetry**
-The system shall send operational telemetry to the configured Application Insights instance.
+* **Description:** The system shall price rentals by customer, customer group, currency, variant, rental unit, and duration scale, apply rental calendars and invoicing plans, and handle returns, extensions, and cancellations.
+* **Priority:** Must
+* **Acceptance Criteria:**
+  * [ ] Rental prices resolve correctly for customer, group, currency, variant, rental unit, and duration.
+  * [ ] Invoicing plans generate scheduled weekly or monthly billing for a rental.
+  * [ ] Partial returns, lost or damaged items, and cancellations update rental status and charges correctly.
 
 ## Dependencies
 
-**Platform dependencies**
-- Microsoft Dynamics 365 Business Central: runtime 17.0, application 28.0.0.0, platform 28.0.0.0.
-- Standard BC modules used by the event subscribers: Sales (`Sales-Post`, `Sales Line`, `Sales Header`, `Sales Shipment Line`, `Sales Invoice Line`), Transfer (`Transfer Line`, `Transfer Receipt`), and reports including `Delete Invoiced Sales Orders`.
+### Other Products or Services
 
-**Application dependencies**
-- `Abakion App Manager Core` (id `9cf9feca-8d2d-49f3-a03d-6ae05f910b2c`), version 29.0.0.0, publisher Abakion. Required for the app to be enabled (`NotificationAppMgt.IsAppEnabled()` gates all subscribers).
-- Abakion's `SCB Publishers` codeunit, referenced by subscribers for SWAP handling and the sales-line integration hooks.
+* Microsoft Dynamics 365 Business Central (host platform for sales, planning, warehouse, and posting) (confirmed by sources)
+* Payment and e-signature providers, if required by customers (inferred, not in source summaries)
 
-**Build and delivery dependencies**
-- Azure DevOps (`dev.azure.com/abakionscb`) for source control and build pipeline (definition 426).
-- ALOps (www.alops.be) as build tooling.
-- Application Insights (instrumentation key and `westeurope` ingestion endpoint).
+### Shared Services
 
-**Tooling and standards**
-- AL language toolchain with `TranslationFile` feature enabled.
-- Generic AL standards referenced in `CLAUDE.md` (`al-standards.md` in `abakion/app-excellence-workflows`).
-- Object ID ranges `6082563–6083562` and `6223181–6224180`, reserved per `app.json`.
-
-**Assumptions**
-- The `SCB Publishers` codeunit and `SCB 920 GlobalVarsSingleInst` codeunit are defined in files not included in the provided excerpts; their behavior is inferred from call sites.
-- Help and marketing content are hosted at `usedynamics.com` and `abakion.com`; their content was not analyzed.
+* Business Central identity, permissions, and company or environment setup (inferred)
+* Business Central reporting and posted-document storage for rental invoices (inferred)
