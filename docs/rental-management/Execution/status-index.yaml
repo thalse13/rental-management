@@ -1,0 +1,82 @@
+# Auto-generated — do not edit manually
+# Updated: 2026-11-11T12:52:00.789Z
+
+documents:
+  - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/4.matrix-drill-down-to-rental-lines.epic.md
+    id: 1c79270f-117f-4168-a18d-360d72cae41f
+    category: epic
+    key: RMA-8
+    status: Draft
+    moscow: Should
+    tshirt: S
+    parent_press_release: rental-management-adds-a-rental-availability.pr.md
+  - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability.pr.md
+    id: 22df51cd-0a17-4ce3-a0a0-ee76f6ce8141
+    category: press-release
+    status: Draft
+    tshirt: M
+    period: Q4 FY26
+    targetDate: 2026-12-31
+  - path: docs/rental-management/Execution/rental-management-now-links-rented-items/4.rental-item-reporting.epic.md
+    id: 22edaf2a-1ebc-4387-b86d-c7546bcea8c0
+    category: epic
+    key: RMA-4
+    status: Draft
+    moscow: Must
+    tshirt: M
+    parent_press_release: rental-management-now-links-rented-items.pr.md
+  - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/3.day-week-month-period-switching.epic.md
+    id: 2da06cbd-5178-4ccc-9f04-a675fb7c86a3
+    category: epic
+    key: RMA-7
+    status: Draft
+    moscow: Must
+    tshirt: S
+    parent_press_release: rental-management-adds-a-rental-availability.pr.md
+  - path: docs/rental-management/Execution/rental-management-now-links-rented-items/1.rental-item-fixed-asset-mapping.epic.md
+    id: 4edc77c0-c1c9-492e-b33a-109b09b7314e
+    category: epic
+    key: RMA-1
+    status: Draft
+    moscow: Must
+    tshirt: M
+    parent_press_release: rental-management-now-links-rented-items.pr.md
+  - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/1.availability-matrix-data-model.epic.md
+    id: 65d0f54c-961c-4b4c-adad-cfb097f0d4e3
+    category: epic
+    key: RMA-5
+    status: Draft
+    moscow: Must
+    tshirt: M
+    parent_press_release: rental-management-adds-a-rental-availability.pr.md
+  - path: docs/rental-management/Execution/rental-management-now-links-rented-items/3.automatic-rental-transaction-capture.epic.md
+    id: 6b68384b-a32a-40aa-8a8c-de4aa40329f2
+    category: epic
+    key: RMA-3
+    status: Draft
+    moscow: Must
+    tshirt: L
+    parent_press_release: rental-management-now-links-rented-items.pr.md
+  - path: docs/rental-management/Execution/rental-management-now-links-rented-items.pr.md
+    id: a95ce514-aec2-4a4b-b76c-0ea805114e1e
+    category: press-release
+    status: Draft
+    tshirt: M
+    period: Q4 FY26
+    targetDate: 2026-12-31
+  - path: docs/rental-management/Execution/rental-management-adds-a-rental-availability/2.availability-matrix-window.epic.md
+    id: dd7c2a9a-182e-4947-b3cf-673c9cc16bb8
+    category: epic
+    key: RMA-6
+    status: Draft
+    moscow: Must
+    tshirt: L
+    parent_press_release: rental-management-adds-a-rental-availability.pr.md
+  - path: docs/rental-management/Execution/rental-management-now-links-rented-items/2.rental-entry-table-fixed-asset.epic.md
+    id: dffd1673-405d-44ee-9d4c-d910c285ff67
+    category: epic
+    key: RMA-2
+    status: Draft
+    moscow: Must
+    tshirt: M
+    parent_press_release: rental-management-now-links-rented-items.pr.md
